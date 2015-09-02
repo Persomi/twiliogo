@@ -23,11 +23,15 @@ type TwilioClient struct {
 	accountSid string
 	authToken  string
 	rootUrl    string
+	httpClient *http.Client
 }
 
-func NewClient(accountSid, authToken string) *TwilioClient {
+func NewClient(accountSid, authToken string, c *http.Client) *TwilioClient {
 	rootUrl := "/" + VERSION + "/Accounts/" + accountSid
-	return &TwilioClient{accountSid, authToken, rootUrl}
+	if c == nil {
+		c = &http.Client{}
+	}
+	return &TwilioClient{accountSid, authToken, rootUrl, c}
 }
 
 func (client *TwilioClient) post(values url.Values, uri string) ([]byte, error) {
@@ -39,9 +43,8 @@ func (client *TwilioClient) post(values url.Values, uri string) ([]byte, error) 
 
 	req.SetBasicAuth(client.AccountSid(), client.AuthToken())
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	httpClient := &http.Client{}
 
-	res, err := httpClient.Do(req)
+	res, err := client.httpClient.Do(req)
 
 	if err != nil {
 		return nil, err
@@ -58,11 +61,10 @@ func (client *TwilioClient) post(values url.Values, uri string) ([]byte, error) 
 	if res.StatusCode != 200 && res.StatusCode != 201 {
 		if res.StatusCode == 500 {
 			return body, Error{"Server Error"}
-		} else {
-			twilioError := new(TwilioError)
-			json.Unmarshal(body, twilioError)
-			return body, twilioError
 		}
+		twilioError := new(TwilioError)
+		json.Unmarshal(body, twilioError)
+		return body, twilioError
 	}
 
 	return body, err
@@ -102,11 +104,10 @@ func (client *TwilioClient) get(queryParams url.Values, uri string) ([]byte, err
 	if res.StatusCode != 200 && res.StatusCode != 201 {
 		if res.StatusCode == 500 {
 			return body, Error{"Server Error"}
-		} else {
-			twilioError := new(TwilioError)
-			json.Unmarshal(body, twilioError)
-			return body, twilioError
 		}
+		twilioError := new(TwilioError)
+		json.Unmarshal(body, twilioError)
+		return body, twilioError
 	}
 
 	return body, err

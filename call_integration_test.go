@@ -1,14 +1,15 @@
 package twiliogo
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationCallList(t *testing.T) {
 	CheckTestEnv(t)
 
-	client := NewClient(API_KEY, API_TOKEN)
+	client := NewClient(API_KEY, API_TOKEN, nil)
 
 	callList, err := GetCallList(client)
 
@@ -22,7 +23,7 @@ func TestIntegrationCallList(t *testing.T) {
 func TestIntegrationMakingCall(t *testing.T) {
 	CheckTestEnv(t)
 
-	client := NewClient(TEST_KEY, TEST_TOKEN)
+	client := NewClient(TEST_KEY, TEST_TOKEN, nil)
 
 	call, err := NewCall(client, TEST_FROM_NUMBER, TO_NUMBER, Callback("http://test.com"))
 
@@ -34,7 +35,7 @@ func TestIntegrationMakingCall(t *testing.T) {
 func TestIntegrationCallListNextPage(t *testing.T) {
 	CheckTestEnv(t)
 
-	client := NewClient(API_KEY, API_TOKEN)
+	client := NewClient(API_KEY, API_TOKEN, nil)
 
 	callList, err := GetCallList(client)
 
@@ -50,7 +51,7 @@ func TestIntegrationCallListNextPage(t *testing.T) {
 func TestIntegrationGetCall(t *testing.T) {
 	CheckTestEnv(t)
 
-	client := NewClient(API_KEY, API_TOKEN)
+	client := NewClient(API_KEY, API_TOKEN, nil)
 
 	callList, err := GetCallList(client)
 
